@@ -63,7 +63,7 @@ public class SourceTableService {
 			String dbuser = props.getUsername();
 			HanaBrowse browser = (HanaBrowse) connection.getBrowser();
 			for (TableImport t : data) {
-				HanaTableMapping entity = new HanaTableMapping(t.getHanaschemaname() + "_" + t.getHanatablename(), dbuser, t.getHanaschemaname(), t.getHanatablename(), browser.getConnection());
+				HanaTableMapping entity = new HanaTableMapping(t.getMappingname(), dbuser, t.getHanaschemaname(), t.getHanatablename(), browser.getConnection());
 				entity.write(browser.getBusinessObjectDirectory());
 			}
 			return JAXBSuccessResponseBuilder.getJAXBResponse("Saved " + data.size() + " table schemas");
