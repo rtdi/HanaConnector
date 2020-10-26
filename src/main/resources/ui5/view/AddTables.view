@@ -7,11 +7,11 @@
         enableBusyIndicator="true"
         enableSelectAll="false"
         ariaLabelledBy="title">
-		<extension>
-			<m:OverflowToolbar>
-				<m:Title text="Shows all tables the connected use has Trigger privileges granted"/>
-			</m:OverflowToolbar>
-		</extension>
+	<t:extension>
+		<OverflowToolbar>
+			<Title text="Shows all tables the connected use has Trigger privileges granted"/>
+		</OverflowToolbar>
+	</t:extension>
      <t:columns>
         <t:Column width="50px">
             <t:template>
