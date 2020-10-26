@@ -1,0 +1,59 @@
+
+<t:Table
+        id="SourceTables"
+        rows="{source>/}"
+        visibleRowCountMode="Auto"
+        selectionMode="None"
+        enableBusyIndicator="true"
+        enableSelectAll="false"
+        ariaLabelledBy="title">
+     <t:columns>
+        <t:Column width="50px">
+            <t:template>
+                <CheckBox selected="{source>imported}" />
+            </t:template>
+        </t:Column>
+        <t:Column filterProperty="hanaschemaname" >
+            <Label text="Hana schema name (Click to Filter)"/>
+            <t:template>
+                <Text text="{source>hanaschemaname}" wrapping="false" renderWhitespace="false" />
+            </t:template>
+        </t:Column>
+        <t:Column filterProperty="hanatablename" >
+            <Label text="Hana table name (Click to Filter)"/>
+            <t:template>
+                <Text text="{source>hanatablename}" wrapping="false" renderWhitespace="false" />
+            </t:template>
+        </t:Column>
+        <t:Column >
+            <Label text="Mapping name"/>
+            <t:template>
+                <Input value="{source>mappingname}" />
+            </t:template>
+        </t:Column>
+    </t:columns>
+</t:Table>
+
+<t:Table
+        id="TableSQL"
+        rows="{tablemapping>/columnmappings}"
+        visibleRowCountMode="Auto"
+        selectionMode="None"
+        enableBusyIndicator="true"
+        enableSelectAll="false"
+        ariaLabelledBy="title">
+     <t:columns>
+        <t:Column filterProperty="alias" >
+            <Label text="Alias (Click to Filter)"/>
+            <t:template>
+                <Text text="{tablemapping>alias}" wrapping="false" renderWhitespace="false" />
+            </t:template>
+        </t:Column>
+        <t:Column filterProperty="sql" >
+            <Label text="SQL Expression (Click to Filter)"/>
+            <t:template>
+                <Input value="{tablemapping>sql}" />
+            </t:template>
+        </t:Column>
+    </t:columns>
+</t:Table>

@@ -1,0 +1,105 @@
+showFooter : function() {
+	return true;
+},
+init : function() {
+	var oModel = new JSONModel();
+	var that = this;
+	oModel.attachRequestFailed(function(oEvent) {
+		that.displayError(JSON.parse(oEvent.getParameter("responseText")));
+	});
+	oModel.setSizeLimit(500000);
+	var sConnectionname = jQuery.sap.getUriParameters().get("connectionname");
+	var sMappingname = jQuery.sap.getUriParameters().get("schemaname");
+	var oTableControl = this.getView().byId("SourceTables");
+	var oTableSQLControl = this.getView().byId("TableSQL");
+	if (sMappingname) {
+		oModel.loadData("../rest/connections/" + encodeURI(sConnectionname) + "/sourcetables/" + encodeURI(sMappingname));
+		oTableControl.setVisible(false);
+		oTableSQLControl.setVisible(true);
+		oTableSQLControl.setBusy(true);
+		oModel.attachRequestCompleted(function() { oTableSQLControl.setBusy(false);});
+		this.getView().setModel(oModel, "tablemapping");
+	} else {
+		oModel.loadData("../rest/connections/" + encodeURI(sConnectionname) + "/sourcetables");
+		oTableControl.setVisible(true);
+		oTableSQLControl.setVisible(false);
+		oTableControl.setBusy(true);
+		oModel.attachRequestCompleted(function() { oTableControl.setBusy(false);});
+		this.getView().setModel(oModel, "source");
+	}
+	var oStateModel = this.getView().getModel("state");
+	oStateModel.setProperty("/title", "Add tables");
+	oStateModel.setProperty("/breadcrumbs", [ 
+		{"text" : "Homepage", "link" : "./Home"}, 
+		{"text" : "Connections", "link" : "./Connections"}, 
+		{"text" : "Schemas", "link" : "./Browse?connectionname=" + encodeURI(sConnectionname) }
+	] );
+},
+edit : function(oEvent) {
+},
+save : function(oEvent) {
+	var sConnectionname = jQuery.sap.getUriParameters().get("connectionname");
+	var sMappingname = jQuery.sap.getUriParameters().get("schemaname");
+	if (!!sConnectionname) {
+		if (sMappingname) {
+			var oModel = this.getView().getModel("tablemapping");
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("POST", "../rest/connections/" + encodeURI(sConnectionname) + "/sourcetables/" + encodeURI(sMappingname));
+			xmlhttp.setRequestHeader("Content-Type", "application/json");
+			var that = this;
+			xmlhttp.onreadystatechange = function() {
+			    if (xmlhttp.readyState == 4) {
+			    	if (xmlhttp.status == 200) {
+				        that.displaySuccess(JSON.parse(xmlhttp.responseText));
+				    } else {
+				        that.displayError(JSON.parse(xmlhttp.responseText));
+				    }
+			    }
+			}
+			xmlhttp.send(oModel.getJSON());
+		} else {
+			var oModel = this.getView().getModel("source");
+			var sName = oModel.getProperty("/name");
+			var oModelFiltered = new JSONModel();
+			var aItemsSend = [];
+			var aRows = oModel.getProperty("/");
+			aRows.forEach(function(oItem) {
+				if (oItem.imported) {
+					aItemsSend.push(oItem);
+				}
+			});
+			oModelFiltered.setProperty("/", aItemsSend);
+			
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("POST", "../rest/connections/" + encodeURI(sConnectionname) + "/sourcetables");
+			xmlhttp.setRequestHeader("Content-Type", "application/json");
+			var that = this;
+			xmlhttp.onreadystatechange = function() {
+			    if (xmlhttp.readyState == 4) {
+			    	if (xmlhttp.status == 200) {
+				        that.displaySuccess(JSON.parse(xmlhttp.responseText));
+				    } else {
+				        that.displayError(JSON.parse(xmlhttp.responseText));
+				    }
+			    }
+			}
+			xmlhttp.send(oModelFiltered.getJSON());
+		}
+	} else {
+		sap.m.MessageToast.show("No url parameter for the connection name");
+	}
+},
+cancel : function(oEvent) {
+},
+onTableFilter : function(oEvent) {
+	var oValue = oEvent.getParameter("newValue");
+	var oTable = this.getView().byId("SourceTables");
+	var filters=[];
+	var oFilter1 = new sap.ui.model.Filter("displayname", sap.ui.model.FilterOperator.Contains, oValue);  
+	filters = [oFilter1];  
+	oTable.getBinding("rows").filter(filters, "Application");		
+},
+onSelectionChange: function(oEvent) {
+	var oPlugin = oEvent.getSource();
+	var iIndices = oPlugin.getSelectedIndices();
+}
