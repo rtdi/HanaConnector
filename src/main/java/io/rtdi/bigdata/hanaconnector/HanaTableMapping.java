@@ -143,7 +143,7 @@ public class HanaTableMapping {
 				existingtriggers.add(rs.getString(1));
 			}
 			if (existingtriggers.size() < 3) {
-				if (getPKColumns().size() == 0) {
+				if (getPKColumns() == null || getPKColumns().size() == 0) {
 					throw new ConnectorRuntimeException("This replication technology does only work on tables with primary keys", null, 
 							"Please remove the table specified from the list of tables to be replicated", getHanatablename());
 				} else if (getPKColumns().size() > 6) {
@@ -291,7 +291,7 @@ public class HanaTableMapping {
 				columncount++;
 			}
 			if (columncount == 0) {
-				throw new ConnectorRuntimeException("This table does not seem to exist in the Hana database itself - not activated?, not a transparent table?", null, 
+				throw new ConnectorRuntimeException("This table does not seem to exist in the Hana database itself", null, 
 						"Execute the sql as Hana user \"" + username + "\"", sql);
 			}
 		} catch (SQLException e) {
@@ -573,7 +573,7 @@ public class HanaTableMapping {
 					String hanadatatypestring = m.getHanadatatype();
 					String columnname = m.getAlias();
 					AvroField f = valueschema.add(columnname, getDataType(hanadatatypestring), null, true);
-					if (getPKColumns().contains(m.getTableColumnName())) {
+					if (pkcolumns != null && pkcolumns.contains(m.getTableColumnName())) {
 						f.setPrimaryKey();
 					}
 				}

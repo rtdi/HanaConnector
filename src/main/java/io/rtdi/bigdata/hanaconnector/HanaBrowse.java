@@ -86,6 +86,7 @@ public class HanaBrowse extends BrowsingService<HanaConnectionProperties> {
 		String sql = "SELECT schema_name, table_name FROM tables \r\n"
 				+ "WHERE schema_name IN (SELECT schema_name FROM EFFECTIVE_PRIVILEGES WHERE user_name = CURRENT_USER AND PRIVILEGE = 'TRIGGER' AND object_type = 'SCHEMA')\r\n"
 				+ "OR (schema_name, table_name) IN (SELECT schema_name, object_name FROM EFFECTIVE_PRIVILEGES WHERE user_name = CURRENT_USER AND PRIVILEGE = 'TRIGGER' AND object_type = 'TABLE')\r\n"
+				+ "OR schema_name = CURRENT_USER\r\n"
 				+ "order by 1,2";
 		try (PreparedStatement stmt = conn.prepareStatement(sql);) {
 			ResultSet rs = stmt.executeQuery();
