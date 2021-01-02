@@ -483,7 +483,6 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 		try (PreparedStatement stmt = conn.prepareStatement(sql); ) {
 			schema = obj.getAvroSchema();
 			beginInitialLoadTransaction(transactionid, schemaname, instance.getInstanceNumber());
-			long rowcount = 0L;
 			try (ResultSet rs = stmt.executeQuery();) {
 				while (rs.next()) {
 					JexlRecord r = convert(rs, schema);
@@ -494,12 +493,11 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 							RowType.INSERT,
 							null,
 							getProducerProperties().getName());
-					rowcount++;
 				}
 			}
-			commitInitialLoadTransaction(rowcount);
-			logger.debug("Initial load for mapping \"{}\" is completed, loaded {} rows", schemaname, rowcount);
-			return rowcount;
+			commitInitialLoadTransaction();
+			logger.debug("Initial load for mapping \"{}\" is completed, loaded {} rows", schemaname, getCurrentTransactionRowCount());
+			return getCurrentTransactionRowCount();
 		} catch (SQLException e) {
 			abortTransaction();
 			throw new ConnectorRuntimeException("Executing the initial load SQL failed with SQL error", e, 
