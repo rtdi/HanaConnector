@@ -348,7 +348,6 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 		long min_transactionid = Long.valueOf(from_transaction);
 		long max_transactionid = getMaxTransactionId(min_transactionid);
 		String sql = null;
-		
 		if (min_transactionid != max_transactionid) { // If Hana has not processed a single record anywhere, no need to check for data
 			logger.debug("Reading change data from Hana transaction id \"{}\" to transaction id \"{}\"", min_transactionid, max_transactionid);
 			try {
