@@ -18,7 +18,7 @@ public class HanaConnectorFactory extends ConnectorFactory<HanaConnectionPropert
 implements IConnectorFactoryProducer<HanaConnectionProperties, HanaProducerProperties> {
 
 	public HanaConnectorFactory() {
-		super("S4Connector");
+		super("HanaConnector");
 	}
 
 	@Override

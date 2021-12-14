@@ -15,36 +15,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilderException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.rtdi.bigdata.connector.connectorframework.exceptions.ConnectorRuntimeException;
-import io.rtdi.bigdata.connector.pipeline.foundation.SchemaConstants;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroBoolean;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroBytes;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroCLOB;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroDate;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroDecimal;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroDouble;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroFloat;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroInt;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroLong;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroNCLOB;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroNVarchar;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroSTGeometry;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroSTPoint;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroShort;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroTime;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroTimestamp;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroTimestampMicros;
-import io.rtdi.bigdata.connector.pipeline.foundation.avrodatatypes.AvroVarchar;
+import io.rtdi.bigdata.kafka.avro.SchemaConstants;
+import io.rtdi.bigdata.kafka.avro.datatypes.*;
 import io.rtdi.bigdata.connector.pipeline.foundation.exceptions.PropertiesException;
-import io.rtdi.bigdata.connector.pipeline.foundation.exceptions.SchemaException;
-import io.rtdi.bigdata.connector.pipeline.foundation.recordbuilders.AvroField;
-import io.rtdi.bigdata.connector.pipeline.foundation.recordbuilders.SchemaBuilder;
-import io.rtdi.bigdata.connector.pipeline.foundation.recordbuilders.ValueSchema;
+import io.rtdi.bigdata.kafka.avro.recordbuilders.*;
 import io.rtdi.bigdata.connector.pipeline.foundation.utils.FileNameEncoder;
 
 public class HanaTableMapping {
@@ -366,7 +347,7 @@ public class HanaTableMapping {
 
 	
 	@JsonIgnore
-	public Schema getAvroSchema() throws SchemaException, ConnectorRuntimeException {
+	public Schema getAvroSchema() throws SchemaBuilderException, ConnectorRuntimeException {
 		if (avroschema == null) {
 			ValueSchema v = new ValueSchema(getName(), null);
 			createSchema(v);
@@ -582,7 +563,7 @@ public class HanaTableMapping {
 				throw new ConnectorRuntimeException("The schema definition file does not contain any columns!", null, 
 						"Something was wrong when the schema mapping file got created", this.getName());
 			}
-		} catch (SchemaException e) {
+		} catch (SchemaBuilderException e) {
 			throw new ConnectorRuntimeException("The Avro Schema cannot be created due to an internal error", e, 
 					"Please create an issue", valueschema.toString());
 		}

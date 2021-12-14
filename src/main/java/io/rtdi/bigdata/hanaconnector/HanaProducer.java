@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilderException;
 
 import io.rtdi.bigdata.connector.connectorframework.Producer;
 import io.rtdi.bigdata.connector.connectorframework.controller.ProducerInstanceController;
@@ -22,10 +23,9 @@ import io.rtdi.bigdata.connector.pipeline.foundation.SchemaHandler;
 import io.rtdi.bigdata.connector.pipeline.foundation.TopicHandler;
 import io.rtdi.bigdata.connector.pipeline.foundation.TopicName;
 import io.rtdi.bigdata.connector.pipeline.foundation.avro.JexlGenericData.JexlRecord;
-import io.rtdi.bigdata.connector.pipeline.foundation.enums.RowType;
 import io.rtdi.bigdata.connector.pipeline.foundation.exceptions.PropertiesException;
-import io.rtdi.bigdata.connector.pipeline.foundation.exceptions.SchemaException;
 import io.rtdi.bigdata.connector.pipeline.foundation.utils.AvroNameEncoder;
+import io.rtdi.bigdata.kafka.avro.RowType;
 
 /**
  * This is a trigger based S4Hana connector.
@@ -179,7 +179,7 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 	}
 
 	@Override
-	protected Schema createSchema(String sourceschema) throws SchemaException, IOException {
+	protected Schema createSchema(String sourceschema) throws SchemaBuilderException, IOException {
 		try (HanaBrowse browser = new HanaBrowse(getConnectionController());) {
 			HanaTableMapping obj = HanaTableMapping.readDefinition(username, sourceschema, conn, browser.getBusinessObjectDirectory());
 			logger.debug("Mapping File with name {} read for Hana table {}", sourceschema, obj.getHanatablename());
@@ -194,7 +194,7 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 		}
 	}
 
-	private JexlRecord convert(ResultSet rs, Schema schema) throws SQLException, ConnectorRuntimeException, SchemaException {
+	private JexlRecord convert(ResultSet rs, Schema schema) throws SQLException, ConnectorRuntimeException, SchemaBuilderException {
 		JexlRecord r = new JexlRecord(schema);
 		for (int i=3; i<= rs.getMetaData().getColumnCount(); i++) {
 			String columnname = rs.getMetaData().getColumnLabel(i);
@@ -406,7 +406,7 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 			} catch (SQLException e) {
 				abortTransaction();
 				throw new ConnectorRuntimeException("Selecting the changes ran into an error", e, "Any idea?", sql);
-			} catch (SchemaException e) {
+			} catch (SchemaBuilderException e) {
 				abortTransaction();
 				throw new ConnectorRuntimeException("Selecting the changes ran into an error with the schema", e, 
 						"Any idea?", null);
@@ -501,9 +501,9 @@ public class HanaProducer extends Producer<HanaConnectionProperties, HanaProduce
 			abortTransaction();
 			throw new ConnectorRuntimeException("Executing the initial load SQL failed with SQL error", e, 
 					"Execute the sql as Hana user \"" + getConnectionProperties().getUsername() + "\"", sql);
-		} catch (SchemaException e) {
+		} catch (SchemaBuilderException e) {
 			abortTransaction();
-			throw new ConnectorRuntimeException("SchemaException thrown when assigning the values", e, 
+			throw new ConnectorRuntimeException("SchemaBuilderException thrown when assigning the values", e, 
 					null, schema.toString());
 		}
 	}
